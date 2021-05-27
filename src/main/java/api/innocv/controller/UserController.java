@@ -1,6 +1,7 @@
 package api.innocv.controller;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import javax.validation.Valid;
 
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import api.innocv.entities.User;
@@ -42,17 +42,37 @@ public class UserController {
 	}
 	
 	
+	
+	
 	@GetMapping(value = "/users/getUser/{id}", produces = "application/json")
-	public CompletableFuture<ResponseEntity> getUser(@PathVariable (required = true) String id){
+	public ResponseEntity getUser(@PathVariable (required = true) String id){
+		try {
 		log.info("Se procede a buscar el usuario con el id: "+id);
-		return userService.getUser(Long.valueOf(id)).thenApply(ResponseEntity::ok);
+		CompletableFuture<User> user = userService.getUser(Long.valueOf(id));
+		if(user.get()==null) {
+			 return ResponseEntity
+		                .status(HttpStatus.CREATED)
+		                .body("El usuario solicitado no existe");
+			 	
+		}
+		 return ResponseEntity
+	                .status(HttpStatus.CREATED)
+	                .body(user.get());
+		 
+		} catch (InterruptedException | ExecutionException e) {
+		    Thread.currentThread().interrupt();
+			return ResponseEntity
+	                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body("No se ha podido completar la accion, intentelo mas tarde");
+		}
+		 
 	}
 		
 	
 	@PostMapping("/users/createUser")
 	public ResponseEntity saveUser(@Valid @RequestBody User user) {
 		log.info("Se procede a crear un nuevo usuario en la base de datos");
-		userService.saveOrUpdate(user);
+		userService.save(user);
 		
 		log.info("Usuario creado correctamente");
 		
@@ -65,27 +85,60 @@ public class UserController {
 	@PutMapping("/users/updateUser/{id}")
 	public ResponseEntity editar(@Valid @RequestBody User user,
 			@PathVariable (required = true) String id) {
-		
-		log.info("Se procede a actualizar el usuario con el id " +id);
-		user.setId(Long.valueOf(id));
-		userService.saveOrUpdate(user);
-		
-		log.info("Usuario actualizado correctamente");
-		
-		 return ResponseEntity
-	                .status(HttpStatus.CREATED)
-	                .body("Usuario actualizado correctamente");
+		try {
+			log.info("Se procede a actualizar el usuario con el id " +id);
+			
+			
+			if(userService.getUser(Long.valueOf(id)).get() == null) {
+				 return ResponseEntity
+			                .status(HttpStatus.NOT_FOUND)
+			                .body("El usuario que se ha solicitado actualizar no existe");
+			}
+			
+			
+			userService.update(Long.valueOf(id), user.getName(), user.getBirthdate());
+			
+			log.info("Usuario actualizado correctamente");
+			
+			 return ResponseEntity
+		                .status(HttpStatus.CREATED)
+		                .body("Usuario actualizado correctamente");
+		 
+		} catch (InterruptedException | ExecutionException e) {
+		    Thread.currentThread().interrupt();
+			return ResponseEntity
+	                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body("No se ha podido completar la accion, intentelo mas tarde");
+		}
+		 
 		
 	}
 	
 	@DeleteMapping("/users/deleteUser/{id}")
-	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void eliminar(@PathVariable Long id) {
+	public ResponseEntity eliminar(@PathVariable Long id) {
+		try {
 		log.info("Se procede a eliminar el usuario con el id " +id);
 		
-		userService.deleteUser(id);
+		if(userService.getUser(Long.valueOf(id)).get() == null) {
+			 return ResponseEntity
+		                .status(HttpStatus.NOT_FOUND)
+		                .body("El usuario que se ha solicitado eliminar no existe");
+		}
 		
+		userService.deleteUser(id);
+		 
 		log.info("Usuario eliminado correctamente");
+		
+		return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .body("Usuario eliminado correctamente");
+		
+		} catch (InterruptedException | ExecutionException e) {
+		    Thread.currentThread().interrupt();
+			return ResponseEntity
+	                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body("No se ha podido completar la accion, intentelo mas tarde");
+		}
 		
 		 
 	}

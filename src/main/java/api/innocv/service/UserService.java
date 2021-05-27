@@ -1,5 +1,6 @@
 package api.innocv.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -12,7 +13,9 @@ public interface UserService {
 	
 	public CompletableFuture<User> getUser(Long id);
 	
-	public void saveOrUpdate(User user);
+	public void save(User user);
+	
+	public void update(Long id, String name, Date birthdate);
 	
 	public void deleteUser(Long id);
 }

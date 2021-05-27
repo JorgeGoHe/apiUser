@@ -1,5 +1,6 @@
 package api.innocv.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -7,14 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import api.innocv.dao.UserRepository;
+import api.innocv.dao.UserDao;
 import api.innocv.entities.User;
 
 @Service
 public class UserServiceImpl implements UserService {
 
 	@Autowired
-	private UserRepository userDao;
+	private UserDao userDao;
 	
 	@Override
 	@Async("userAsyncThreadExecutor")
@@ -26,15 +27,20 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Async("userAsyncThreadExecutor")
 	public CompletableFuture<User> getUser(Long id) {
-		User user = userDao.getById(id);
+		User user = userDao.findById(id);
 		return CompletableFuture.completedFuture(user);
 	}
 
-	//Se comprueba internamente si el User existe y si existe lo actualiza y si no lo inserta
 	@Override
 	@Async("userAsyncThreadExecutor")
-	public void saveOrUpdate(User user) {
+	public void save(User user) {
 		userDao.save(user);
+	}
+	
+	@Override
+	@Async("userAsyncThreadExecutor")
+	public void update(Long id, String name, Date birthdate) {
+		userDao.update(id, name, birthdate);
 	}
 
 	@Override
@@ -45,6 +51,7 @@ public class UserServiceImpl implements UserService {
 		
 	}
 	
+
 	
 
 }

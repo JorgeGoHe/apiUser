@@ -11,8 +11,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-@SpringBootApplication
-@ComponentScan({ "api.innocv.controller", "api.innocv.service"})
+@SpringBootApplication()
+@ComponentScan({ "api.innocv.controller", "api.innocv.service",  "api.innocv.dao"})
 @EntityScan("api.innocv.entities")
 @EnableJpaRepositories({"api.innocv.dao"})
 @EnableAsync
