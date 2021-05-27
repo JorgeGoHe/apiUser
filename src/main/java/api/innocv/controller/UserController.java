@@ -51,12 +51,12 @@ public class UserController {
 		CompletableFuture<User> user = userService.getUser(Long.valueOf(id));
 		if(user.get()==null) {
 			 return ResponseEntity
-		                .status(HttpStatus.CREATED)
+		                .status(HttpStatus.NOT_FOUND)
 		                .body("El usuario solicitado no existe");
 			 	
 		}
 		 return ResponseEntity
-	                .status(HttpStatus.CREATED)
+	                .status(HttpStatus.OK)
 	                .body(user.get());
 		 
 		} catch (InterruptedException | ExecutionException e) {
