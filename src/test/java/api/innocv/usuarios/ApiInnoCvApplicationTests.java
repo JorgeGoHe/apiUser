@@ -76,7 +76,6 @@ class ApiInnoCvApplicationTests {
 	 
 	    ResponseEntity<String> result = restTemplate.postForEntity(uri, user, String.class);
 	    result.getStatusCodeValue();
-	    //Verify request succeed
 	    
 	    assertEquals(result.getStatusCodeValue(), HttpStatus.SC_CREATED);
 	}
