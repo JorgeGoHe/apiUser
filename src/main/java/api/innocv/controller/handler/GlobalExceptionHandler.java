@@ -1,5 +1,6 @@
 package api.innocv.controller.handler;
 
+import java.text.ParseException;
 import java.util.concurrent.ExecutionException;
 
 import javax.persistence.EntityNotFoundException;
@@ -49,6 +50,13 @@ public class GlobalExceptionHandler {
 			
 		}
 	
+		@ExceptionHandler(ParseException.class)
+		public ResponseEntity<Object> handleExecutionException(ParseException ex) {
+			return new ResponseEntity<Object>(
+					"Uno de los formatos de los parámetros es incorrecto, compruebe todos los datos introducidos",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+
+		}
 	
 	
 }

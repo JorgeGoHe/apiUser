@@ -5,7 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -42,7 +43,7 @@ class ApiInnoCvApplicationTests {
 	public void getUserExist()
 	  throws ClientProtocolException, IOException {
 	
-	    HttpUriRequest request = new HttpGet( "http://localhost:8443/api/users/getUser/"+1);
+		HttpUriRequest request = new HttpGet("http://localhost:8443/api/users/getUser/" + 2);
 
 	    HttpResponse httpResponse = HttpClientBuilder.create().build().execute( request );
 
@@ -63,35 +64,62 @@ class ApiInnoCvApplicationTests {
 	}
 	
 	@Test
-	public void createUserCorrect()
-	  throws ClientProtocolException, IOException, URISyntaxException {
-	    RestTemplate restTemplate = new RestTemplate();
-	     
-	    final String baseUrl = "http://localhost:8443/api/users/createUser";
-	    URI uri = new URI(baseUrl);
-	     
-	    User user = new User();
-	    user.setName("Prueba");
-	    user.setBirthdate(new Date());
-	 
-	    ResponseEntity<String> result = restTemplate.postForEntity(uri, user, String.class);
-	    result.getStatusCodeValue();
-	    
-	    assertEquals(result.getStatusCodeValue(), HttpStatus.SC_CREATED);
+	public void createUser()
+			throws ClientProtocolException, IOException, URISyntaxException, ParseException {
+		RestTemplate restTemplate = new RestTemplate();
+
+		final String baseUrl = "http://localhost:8443/api/users/createUser";
+		URI uri = new URI(baseUrl);
+
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		User user = new User();
+		user.setName("Prueba");
+		user.setBirthdate(formatter.parse("12/12/2020"));
+
+		ResponseEntity<String> result = restTemplate.postForEntity(uri, user, String.class);
+		result.getStatusCodeValue();
+
+		assertEquals(result.getStatusCodeValue(), HttpStatus.SC_CREATED);
+	}
+	
+	@Test
+	public void updateUser() throws ClientProtocolException, IOException, URISyntaxException, ParseException {
+		RestTemplate restTemplate = new RestTemplate();
+
+		final String baseUrl = "http://localhost:8443/api/users/updateUser/6";
+		URI uri = new URI(baseUrl);
+
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		User user = new User();
+		user.setName("Prueba");
+		user.setBirthdate(formatter.parse("12/12/2020"));
+
+		ResponseEntity<String> result = restTemplate.postForEntity(uri, user, String.class);
+		result.getStatusCodeValue();
+
+		assertEquals(result.getStatusCodeValue(), HttpStatus.SC_CREATED);
 	}
 	
 	
-	
 	@Test
-	public void deleteUserCompleteData()
+	public void deleteUserExist()
 	  throws ClientProtocolException, IOException {
-	    HttpUriRequest request = new HttpDelete( "http://localhost:8443/api/users/deleteUser/"+1);
+		HttpUriRequest request = new HttpDelete("http://localhost:8443/api/users/deleteUser/" + 6);
 
 	    
 	    HttpResponse httpResponse = HttpClientBuilder.create().build().execute( request );
 
 	    
 	    assertEquals(httpResponse.getStatusLine().getStatusCode(), HttpStatus.SC_NO_CONTENT);
+	}
+
+	@Test
+	public void deleteUserNoExist() throws ClientProtocolException, IOException {
+		HttpUriRequest request = new HttpDelete("http://localhost:8443/api/users/deleteUser/" + 10);
+
+		HttpResponse httpResponse = HttpClientBuilder.create().build().execute(request);
+
+		assertEquals(httpResponse.getStatusLine().getStatusCode(), HttpStatus.SC_NOT_FOUND);
 	}
 
 }

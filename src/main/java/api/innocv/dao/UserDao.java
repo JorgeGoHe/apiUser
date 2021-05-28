@@ -16,6 +16,7 @@ public interface UserDao {
 
     public void save(User user);
 
+	@Transactional
     public void deleteById(Long id);
 
     @Transactional

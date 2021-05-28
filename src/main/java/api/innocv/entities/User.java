@@ -14,6 +14,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 
 import org.hibernate.annotations.Proxy;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -38,6 +39,7 @@ public class User implements Serializable{
 	
 	@Column(name="BIRTHDATE")
 	@JsonFormat(pattern = "dd/MM/yyyy")
+	@DateTimeFormat(pattern = "dd/MM/yyyy")
 	@NotNull(message = "Debe de insertar una fecha de nacimiento")
 	@PastOrPresent
 	private Date birthdate;
